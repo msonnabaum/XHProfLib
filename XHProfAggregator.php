@@ -1,14 +1,25 @@
 <?php
+require(dirname(__FILE__) . '/XHProfRunsInterface.php');
+require(dirname(__FILE__) . '/XHProfRunsFile.php');
 
 class XHProfAggregator {
   public $runs = array();
 
   /**
+   * An instance of a class that implements XHProfRunsInterface.
+   */
+  protected $xhprof_runs_class;
+
+  public function __construct() {
+    $this->xhprof_runs_class = new XHProfRunsFile();
+  }
+
+  /**
    * @param $run_data
    * @return void
    */
-  public function addRun($run_data) {
-    $this->runs[] = $run_data;
+  public function addRun($run_id, $namespace) {
+    $this->runs[] = array('run_id' => $run_id, 'namespace' => $namespace);
   }
 
   /**
@@ -63,29 +74,22 @@ class XHProfAggregator {
    */
   public function sum() {
     $keys = array();
-    foreach ($this->runs as $data) {
-      $keys = $keys + array_keys($data);
-    }
-
     $agg_run = array();
-    foreach ($keys as $key) {
-      $agg_key = array();
-      // Check which runs have this parent_child function key, collect metrics if so.
-      foreach ($this->runs as $data) {
-        if (isset($data[$key])) {
-          foreach ($data[$key] as $metric => $val) {
-            $agg_key[$metric][] = $val;
+    foreach ($this->runs as $run) {
+      $data = $this->xhprof_runs_class->getRun($run['run_id'], $run['namespace']);
+      $keys = array_keys($data);
+
+      foreach ($keys as $key) {
+        foreach ($data[$key] as $metric => $val) {
+          if (isset($agg_run[$key][$metric])) {
+            $agg_run[$key][$metric] += $val;
+          }
+          else {
+            $agg_run[$key][$metric] = $val;
           }
         }
       }
-
-      // Sum each metric for the key into the aggregated run.
-      $agg_run[$key] = array();
-      foreach ($agg_key as $metric => $vals) {
-        $agg_run[$key][$metric] = array_sum($vals);
-      }
     }
-
     return $agg_run;
   }
 

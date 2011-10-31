@@ -9,7 +9,7 @@ class XHProfRunsFile implements XHProfRunsInterface {
     $this->suffix = 'xhprof';
   }
 
-  private function gen_run_id() {
+  private function genRunId() {
     return uniqid();
   }
 
