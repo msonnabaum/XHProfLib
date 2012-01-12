@@ -1,6 +1,8 @@
 <?php
 
-class XHProfParser {
+namespace XHProfLib\Parser;
+
+class Parser {
   public $data = array();
   public $totals = array();
   public $symbol_totals = array();

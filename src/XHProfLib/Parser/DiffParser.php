@@ -1,6 +1,8 @@
 <?php
 
-class XHProfDiffParser {
+namespace XHProfLib\Parser;
+
+class DiffParser {
   public $parser1;
   public $parser2;
   public $totals = array();

@@ -1,6 +1,8 @@
 <?php
 
-class XHProfRunsFile implements XHProfRunsInterface {
+namespace XHProfLib\Runs;
+
+class FileRuns implements RunsInterface {
   private $dir;
   private $suffix;
 

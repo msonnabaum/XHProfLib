@@ -2,7 +2,7 @@
 require(dirname(__FILE__) . '/XHProfRunsInterface.php');
 require(dirname(__FILE__) . '/XHProfRunsFile.php');
 
-class XHProfAggregator {
+class Aggregator {
   public $runs = array();
 
   /**
