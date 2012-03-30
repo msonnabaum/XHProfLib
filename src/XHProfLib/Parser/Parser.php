@@ -2,31 +2,33 @@
 
 namespace XHProfLib\Parser;
 
+use XHProfLib\Run;
+
 class Parser {
-  public $data = array();
+  public $run;
   public $totals = array();
   public $symbol_totals = array();
 
-  public function __construct($data) {
-    $this->data = $data;
+  public function __construct(Run $run) {
+    $this->run = $run;
     $this->getTotals();
   }
 
   public function getTotals() {
-    $this->totals = $this->data['main()'];
+    $this->totals = $this->run->data['main()'];
     $this->totals['ct'] = $this->getCallCount();
     return $this->totals;
   }
 
   public function toXML($totals) {
     $xml = new SimpleXMLElement('<xhprof_data/>');
-    array_walk_recursive(array_flip($totals), array ($xml, 'addChild'));
+    array_walk_recursive(array_flip($totals), array($xml, 'addChild'));
     return $xml->asXML();
   }
 
   public function getCallCount() {
     $call_count = 0;
-    foreach ($this->data as $symbol) {
+    foreach ($this->run->data as $symbol) {
       $call_count += $symbol['ct'];
     }
     return $call_count;
@@ -42,7 +44,7 @@ class Parser {
         'pmu' => 0,
       );
     }
-    foreach ($this->data as $key => $symbol_data) {
+    foreach ($this->run->data as $key => $symbol_data) {
       if ($key !== 'main()') {
         list($caller, $cur_symbol) = explode('==>', $key);
         if ($cur_symbol == $symbol) {
@@ -56,10 +58,11 @@ class Parser {
       }
     }
   }
+
   protected function calculatePercentages($symbol_metrics) {
     foreach ($symbol_metrics as $metric => $value) {
       if ($this->totals[$metric] !== 0) {
-        $symbol_metrics[$metric . '%'] = $value / $this->totals[$metric];
+        $symbol_metrics[$metric . '%'] = round(100 * ($value / $this->totals[$metric]), 2);
       }
     }
     return $symbol_metrics;

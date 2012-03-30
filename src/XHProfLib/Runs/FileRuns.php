@@ -2,6 +2,8 @@
 
 namespace XHProfLib\Runs;
 
+use XHProfLib;
+
 class FileRuns implements RunsInterface {
   private $dir;
   private $suffix;
@@ -11,7 +13,7 @@ class FileRuns implements RunsInterface {
     $this->suffix = 'xhprof';
   }
 
-  private function gen_run_id() {
+  private function runId($type) {
     return uniqid();
   }
 
@@ -32,7 +34,8 @@ class FileRuns implements RunsInterface {
     }
 
     $contents = file_get_contents($file_name);
-    return unserialize($contents);
+    $run = new Run($run_id, $namespace, unserialize($contents));
+    return $run;
   }
 
   public function getRuns($namespace = NULL) {
@@ -42,6 +45,32 @@ class FileRuns implements RunsInterface {
         return $f;
       }, $files);
     return $files;
+  }
+
+  /**
+   * Mostly borrowed from the original XHProfRuns_Default class.
+   */
+  public function saveRun($data, $namespace, $run_id = NULL) {
+    // Use PHP serialize function to store the XHProf's
+    // raw profiler data.
+    $data = serialize($data);
+
+    if ($run_id === NULL) {
+      $run_id = $this->runId($namespace);
+    }
+
+    $file_name = $this->fileName($run_id, $namespace);
+    $file = fopen($file_name, 'w');
+
+    if ($file) {
+      fwrite($file, $data);
+      fclose($file);
+    }
+    else {
+      throw new \Exception("Could not open $file_name\n");
+    }
+
+    return $run_id;
   }
 
   public function scanXHProfDir($dir, $namespace = NULL) {
