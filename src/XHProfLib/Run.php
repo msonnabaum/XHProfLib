@@ -15,4 +15,12 @@ class Run {
     $this->$namespace = $namespace;
     $this->data = $data;
   }
+
+  public function getKeys() {
+    return array_keys($this->data);
+  }
+
+  public function getMetrics($key) {
+    return $this->data[$key];
+  }
 }

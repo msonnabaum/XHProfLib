@@ -1,5 +1,9 @@
 <?php
 
+namespace XHProfLib;
+
+use XHProfLib\Runs\FileRuns;
+
 class Aggregator {
   public $runs = array();
 
@@ -9,7 +13,7 @@ class Aggregator {
   protected $xhprof_runs_class;
 
   public function __construct() {
-    $this->xhprof_runs_class = new XHProfRunsFile();
+    $this->xhprof_runs_class = new FileRuns();
   }
 
   /**
@@ -74,11 +78,11 @@ class Aggregator {
     $keys = array();
     $agg_run = array();
     foreach ($this->runs as $run) {
-      $data = $this->xhprof_runs_class->getRun($run['run_id'], $run['namespace']);
-      $keys = array_keys($data);
+      $run = $this->xhprof_runs_class->getRun($run['run_id'], $run['namespace']);
+      $keys = $run->getKeys();
 
       foreach ($keys as $key) {
-        foreach ($data[$key] as $metric => $val) {
+        foreach ($run->getMetrics($key) as $metric => $val) {
           if (isset($agg_run[$key][$metric])) {
             $agg_run[$key][$metric] += $val;
           }

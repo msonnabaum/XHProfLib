@@ -2,7 +2,7 @@
 
 namespace XHProfLib\Runs;
 
-use XHProfLib;
+use XHProfLib\Run;
 
 class FileRuns implements RunsInterface {
   private $dir;
@@ -30,7 +30,7 @@ class FileRuns implements RunsInterface {
     $file_name = $this->fileName($run_id, $namespace);
 
     if (!file_exists($file_name)) {
-      throw new Exception("Could not find file $file_name");
+      throw new \Exception("Could not find file $file_name");
     }
 
     $contents = file_get_contents($file_name);
@@ -77,10 +77,10 @@ class FileRuns implements RunsInterface {
     if (is_dir($dir)) {
       $runs = array();
       foreach (glob("{$this->dir}/*.{$this->suffix}") as $file) {
-        list($run, $source) = explode('.', basename($file));
+        preg_match("/(?:(?<run>\w+)\.)(?:(?<namespace>.+)\.)(?<ext>\w+)/", basename($file), $matches);
         $runs[] = array(
-          'run_id' => $run,
-          'namespace' => $source,
+          'run_id' => $matches['run'],
+          'namespace' => $matches['namespace'],
           'basename' => htmlentities(basename($file)),
           'date' => date("Y-m-d H:i:s", filemtime($file)),
         );
