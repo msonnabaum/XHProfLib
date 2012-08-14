@@ -8,8 +8,13 @@ class FileRuns implements RunsInterface {
   private $dir;
   private $suffix;
 
-  public function __construct() {
-    $this->dir = ini_get("xhprof.output_dir") ?: sys_get_temp_dir();
+  public function __construct($dir = NULL) {
+    if ($dir) {
+      $this->dir = $dir;
+    }
+    else {
+      $this->dir = ini_get("xhprof.output_dir") ?: sys_get_temp_dir();
+    }
     $this->suffix = 'xhprof';
   }
 
