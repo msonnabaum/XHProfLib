@@ -82,7 +82,7 @@ class FileRuns implements RunsInterface {
     if (is_dir($dir)) {
       $runs = array();
       foreach (glob("{$this->dir}/*.{$this->suffix}") as $file) {
-        preg_match("/(?:(?<run>\w+)\.)(?:(?<namespace>.+)\.)(?<ext>\w+)/", basename($file), $matches);
+        preg_match("/(?:(?<run>\w+)\.)(?:(?<namespace>[^.]+)\.)(?<ext>[\w.]+)/", basename($file), $matches);
         $runs[] = array(
           'run_id' => $matches['run'],
           'namespace' => $matches['namespace'],
