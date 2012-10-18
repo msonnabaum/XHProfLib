@@ -35,11 +35,17 @@ class FileRuns implements RunsInterface {
     $file_name = $this->fileName($run_id, $namespace);
 
     if (!file_exists($file_name)) {
-      throw new \Exception("Could not find file $file_name");
+      throw new \RuntimeException("Could not find file $file_name");
     }
 
-    $contents = file_get_contents($file_name);
-    $run = new Run($run_id, $namespace, unserialize($contents));
+    $serialized_contents = file_get_contents($file_name);
+    $contents = @unserialize($serialized_contents);
+
+    if ($contents === FALSE) {
+      throw new \UnexpectedValueException("Unable to unserialize $file_name!");
+    }
+
+    $run = new Run($run_id, $namespace, $contents);
     return $run;
   }
 

@@ -13,7 +13,7 @@ class Aggregator {
   protected $xhprof_runs_class;
 
   public function __construct() {
-    $this->xhprof_runs_class = new FileRuns();
+    $this->xhprof_runs = new FileRuns();
   }
 
   /**
@@ -72,13 +72,26 @@ class Aggregator {
 
 
   /**
+   * @param bool $skip_bad_runs
+   *  Set to TRUE to prevent this method from failing in the case of a bad run
+   *  (i.e. a corrupt, unserializable file).
    * @return array
    */
-  public function sum() {
+  public function sum($skip_bad_runs = FALSE) {
     $keys = array();
     $agg_run = array();
     foreach ($this->runs as $run) {
-      $run = $this->xhprof_runs_class->getRun($run['run_id'], $run['namespace']);
+      try {
+        $run = $this->xhprof_runs->getRun($run['run_id'], $run['namespace']);
+      }
+      catch (\UnexpectedValueException $e) {
+        if ($skip_bad_runs) {
+          continue;
+        }
+        else {
+          throw $e;
+        }
+      }
       $keys = $run->getKeys();
 
       foreach ($keys as $key) {
@@ -107,3 +120,4 @@ class Aggregator {
     return sqrt(array_sum(array_map(array('XHProfTools', 'sd_square'), $array, array_fill(0, count($array), (array_sum($array) / count($array))))) / (count($array)-1));
   }
 }
+
