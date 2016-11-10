@@ -1,17 +1,22 @@
 {
-  "name": "XHProflib",
+  "name": "msonnabaum/xhproflib",
   "version": "1.0.0",
   "homepage": "https://github.com/msonnabaum/xhproflib",
   "type": "library",
+  "description": "XhProf profiler library",
   "license": "MIT",
   "authors": [
-    {"name": "Mark Sonnabaum",
-    "email": "mark.sonnabaum@acquia.com"}
+    {
+      "name": "Mark Sonnabaum",
+      "email": "mark.sonnabaum@acquia.com"
+    }
   ],
   "require": {
     "php": ">=5.3.0"
   },
   "autoload": {
-    "psr-0": {"XHProfLib": "src/"}
+    "psr-0": {
+      "XHProfLib": "src/"
+    }
   }
 }
